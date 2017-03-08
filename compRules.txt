@@ -18,6 +18,10 @@ willing to burn in hell forever.
 
 ***********************************************************
 
+author : nicolas calley
+
+***********************************************************
+
 *** This field implements an identifier to the language.
 *** If this identifier isn't found at the beginning of the
 *** code, the compilator will not recognize the following
@@ -36,7 +40,10 @@ endLineStatement{
 *** Used to define what's inside a variable
 
 affectationStatement{
+varType
+varName
 <-
+varObject
 }
 
 *** Basic if conditionnal
@@ -78,12 +85,12 @@ boolean:boolean
 *** Used for boolean comparison
 
 booleanOperators{
-==
-<
-<=
->
->=
-!=
+==,eq
+<,sup
+<=,supEq
+>,les
+>=,lesEq
+!=,diff
 }
 
 *** Used for calculs
@@ -102,3 +109,41 @@ increment{
 --
 }
 
+*** Used to comment your code
+
+commentStatement{
+**
+}
+
+*** Indicates the end of the file
+
+EOFStatement{
+FriendshipIsMagic
+}
+
+*** Used for a function
+
+functionStatement{
+returnType
+name
+[,]
+{,}
+}
+
+*** Used in a function to return something (returnType)
+
+returnStatement{
+giveThisBack
+}
+
+*** Defined function name for the main function
+
+mainStatement{
+theMagicStartsHere
+}
+
+*** Used to print something in the console
+
+printStatement{
+write
+}

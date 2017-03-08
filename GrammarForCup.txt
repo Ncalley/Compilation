@@ -1,0 +1,125 @@
+Grammaire du langage PONY
+
+****************************************************
+
+terminals:
+
+recognitionLanguageStatement, EOFStatement, void, [, ], {, }, mainStatement, 
+endLineStatement,ifIdentifier, returnType, functionName, returnIdentifier,
+whileIdentifier, forIdentifier, varName, affectationIdentifier, textIdentifier,
+text, booleanIdentifier, numberIdentifier, incrementIdentifier, 
+decrementIdentifier, printIdentifier,additionOperator,substractionOperator, 
+multiplicationOperator, divisionOperator, equalIdentifier, higherThanIdentifier,
+higherEqualThanIdentifier, lesserThanIdentifier, lesserEqualThanIdentifier,
+differentIdentifier, orIdentifier, andIdentifier, xorIdentifier
+
+non terminals:
+
+Pony, content, mainFunction, instruction, ifStatement, whileLoopStatement, 
+forLoopStatement, affectationStatement,incrementStatement, printStatement,
+booleanExpression, function, return, wellTypedObject, expression, 
+decrementStatement, operator, booleanOperator
+
+****************************************************
+
+*** the language itself.
+
+Pony = recognitionLanguageStatement endLineStatement content EOFStatement
+
+*** A mix composed of the main function and instructions and functions.
+
+content = mainFunction
+	| instruction
+	| function mainFunction
+	| mainFunction function
+	| (nothing)
+
+*** the main function of the program, may use other functions.
+
+mainFunction = void mainStatement [ ] { instruction } 
+
+*** classic function with a given return type (may be void), the return is always
+*** at the end of the function for the moment (can't be used inside of a loop).
+ 
+function = function function
+	| returnType functionName [ ] { instruction return }
+	| void functionName [ ] { instruction }
+
+*** Something given by a function
+
+return = returnIdentifier wellTypedObject endLineStatement
+
+*** Any loop, variable manipulation or printStatement
+
+instruction = instruction instruction
+	| ifStatement
+	| whileLoopStatement
+	| forLoopStatement
+	| affectationStatement endLineStatement
+	| incrementStatement endLineStatement
+	| printStatement endLineStatement
+
+*** A simple if
+
+ifStatement = ifIdentifier [ booleanExpression ] { instruction }
+
+*** The basic while loop
+
+whileLoopStatement = whileIdentifier [ booleanExpression ] { instruction }
+
+*** The basic for loop
+
+forLoopStatement = forIdentifier [ booleanExpression ] { instruction } 
+
+*** The binding of a value to a variable 
+
+affectationStatement = numberIdentifier varName affectationIdentifier expression endLineStatement
+	| textIdentifier varName affectationIdentifier text endLineStatement
+	| booleanIdentifier varName affectationIdentifier booleanExpression endLineStatement
+
+*** Incrementation of a number (must be applied to a number-containing variable)
+
+incrementStatement = varName incrementIdentifier endLineStatement
+
+*** Decrementation of a number (same constraints as the incrementation)
+
+decrementStatement = varName decrementIdentifier endLineStatement
+
+*** Used to print something in the console (may be useless without high enough language)
+
+printStatement = printIdentifier varName endLineStatement
+	| printIdentifier numberIdentifier endLineStatement
+	| printIdentifier text endLineStatement
+	| printIdentifier booleanExpression endLineStatement
+
+*** Mathematical operation (non boolean) recursively builded with operators
+ 
+expression = ( expression )
+	| expression operator expression
+	| numberIdentifier
+	| varName
+
+*** Mathematical operators, used in expressions
+
+operator = additionOperator
+	| substractionOperator
+	| multiplicationOperator
+	| divisionOperator
+
+*** Boolean operation recursively builded with operators
+
+booleanExpression = booleanExpression booleanOperator booleanExpression
+	| expression booleanOperator expression
+	| booleanIdentifier 
+
+*** Boolean operator, used in booleanExpressions
+
+booleanOperator = equalIdentifier
+	| higherThanIdentifier
+	| higherEqualThanIdentifier
+	| lesserThanIdentifier
+	| lesserEqualThanIdentifier
+	| differentIdentifier
+	| orIdentifier
+	| andIdentifier
+	| xorIdentifier
