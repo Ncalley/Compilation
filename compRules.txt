@@ -1,0 +1,104 @@
+***********************************************************
+   ***      Compilation rules for PONY language      ***
+***********************************************************
+
+	Power
+	Of
+	Nothing
+	Yet
+
+***********************************************************
+***********************************************************
+
+This is a complete set of compilation rules that will be 
+applied by the progam :
+
+Don't use this file with another program unless you are
+willing to burn in hell forever.
+
+***********************************************************
+
+*** This field implements an identifier to the language.
+*** If this identifier isn't found at the beginning of the
+*** code, the compilator will not recognize the following
+*** instructions and won't be able to compile.
+
+recognitionLanguageStatement{
+#PONY#
+}
+
+*** End of the line character
+
+endLineStatement{
+<3
+}
+
+*** Used to define what's inside a variable
+
+affectationStatement{
+<-
+}
+
+*** Basic if conditionnal
+
+ifStatement{
+underTheCondition[boolean]
+do
+invalidDo
+{,}
+}
+
+*** Basic while loop definition
+
+whileLoopStatement{
+whenIsVerified
+[,]
+do
+{,}
+}
+
+*** Basic for loop definition
+
+forLoopStatement{
+whenVerified
+[,]
+do
+{,}
+}
+
+*** Defines which type in the language corresponds to
+*** a type in beta
+
+typeMatches{
+Integer:Integer
+String:String
+boolean:boolean
+}
+
+*** Used for boolean comparison
+
+booleanOperators{
+==
+<
+<=
+>
+>=
+!=
+}
+
+*** Used for calculs
+
+calculOperators{
++
+-
+*
+/
+}
+
+*** Used to increment an integer
+
+increment{
+++
+--
+}
+
