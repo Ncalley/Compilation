@@ -15,7 +15,10 @@ multiplicationOperator, divisionOperator, equalIdentifier, higherThanIdentifier,
 higherEqualThanIdentifier, lesserThanIdentifier, lesserEqualThanIdentifier,
 differentIdentifier, orIdentifier, andIdentifier, xorIdentifier;
 
-non terminal ;
+non terminal Pony, content, mainFunction, instruction, ifStatement, whileLoopStatement, 
+forLoopStatement, affectationStatement,incrementStatement, printStatement,
+booleanExpression, function, return, wellTypedObject, expression, 
+decrementStatement, operator, booleanOperator;
 
 start with x;
       
