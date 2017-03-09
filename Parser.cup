@@ -1,0 +1,13 @@
+/* GRAMMAIRE du langage PONY
+ * PROJET : CALLEY Nicolas - ADICEOM Audrey - FERRY Emeline - RAGAZZI Inès - FERNANDEZ Joyce
+ */ 
+package fr.ul.miage.exemple.generated;
+
+/* la grammaire */
+terminal ;
+
+non terminal ;
+
+start with x;
+      
+x ::=
