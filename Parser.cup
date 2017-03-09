@@ -1,13 +1,22 @@
 /* GRAMMAIRE du langage PONY
- * PROJET : CALLEY Nicolas - ADICEOM Audrey - FERRY Emeline - RAGAZZI Inès - FERNANDEZ Joyce
+ * PROJET : CALLEY Nicolas - ADICEOM Audrey - FERRY Emeline - RAGAZZI InÃ¨s - FERNANDEZ Joyce
  */ 
 package fr.ul.miage.exemple.generated;
 
+!!!! aux crochets, on pose CO = [, CF = ], ACO = { et ACF = }
+
 /* la grammaire */
-terminal ;
+terminal recognitionLanguageStatement, EOFStatement, void, [, ], {, }, mainStatement, 
+endLineStatement,ifIdentifier, returnType, functionName, returnIdentifier,
+whileIdentifier, forIdentifier, varName, affectationIdentifier, textIdentifier,
+text, booleanIdentifier, numberIdentifier, incrementIdentifier, 
+decrementIdentifier, printIdentifier,additionOperator,substractionOperator, 
+multiplicationOperator, divisionOperator, equalIdentifier, higherThanIdentifier,
+higherEqualThanIdentifier, lesserThanIdentifier, lesserEqualThanIdentifier,
+differentIdentifier, orIdentifier, andIdentifier, xorIdentifier;
 
 non terminal ;
 
 start with x;
       
-x ::=
+x ::= 
