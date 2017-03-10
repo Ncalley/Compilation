@@ -3,10 +3,10 @@
  */ 
 package fr.ul.miage.exemple.generated;
 
-!!!! aux crochets, on pose CO = [, CF = ], ACO = { et ACF = }
+//!!!! aux crochets, on pose CO = [, CF = ], ACO = { et ACF = }, PO = (, PF = )
 
 /* la grammaire */
-terminal recognitionLanguageStatement, EOFStatement, void, CO, CF, ACO, ACF, mainStatement, 
+terminal recognitionLanguageStatement, EOFStatement, void, CO, CF, ACO, ACF,PO, PF, mainStatement, 
 endLineStatement,ifIdentifier, returnType, functionName, returnIdentifier,
 whileIdentifier, forIdentifier, varName, affectationIdentifier, textIdentifier,
 text, booleanIdentifier, numberIdentifier, incrementIdentifier, 
@@ -20,13 +20,11 @@ forLoopStatement, affectationStatement,incrementStatement, printStatement,
 booleanExpression, function, return, wellTypedObject, expression, 
 decrementStatement, operator, booleanOperator;
 
-start with x;
-      
-x ::= Pony
+start with Pony;
 
 // the language itself.
 
-Pony ::= recognitionLanguageStatement endLineStatement content EOFStatement
+Pony ::= recognitionLanguageStatement endLineStatement content EOFStatement;
 
 // A mix composed of the main function and instructions and functions.
 
@@ -34,22 +32,22 @@ content ::= mainFunction
 	| instruction
 	| function mainFunction
 	| mainFunction function
-	| /*(nothing)*/
+	| /*(nothing)*/;
 
 // the main function of the program, may use other functions.
 
-mainFunction ::= void mainStatement CO CF ACO instruction ACF 
+mainFunction ::= void mainStatement CO CF ACO instruction ACF ;
 
 // classic function with a given return type (may be void), the return is always
 // at the end of the function for the moment (can't be used inside of a loop).
  
 function ::= function function
 	| returnType functionName CO CF ACO instruction return ACF
-	| void functionName CO CF ACO instruction ACF
+	| void functionName CO CF ACO instruction ACF;
 
 // Something given by a function
 
-return ::= returnIdentifier wellTypedObject endLineStatement
+return ::= returnIdentifier wellTypedObject endLineStatement;
 
 // Any loop, variable manipulation or printStatement
 
@@ -59,60 +57,60 @@ instruction ::= instruction instruction
 	| forLoopStatement
 	| affectationStatement endLineStatement
 	| incrementStatement endLineStatement
-	| printStatement endLineStatement
+	| printStatement endLineStatement;
 
 // A simple if
 
-ifStatement ::= ifIdentifier CO booleanExpression CF ACO instruction ACF
+ifStatement ::= ifIdentifier CO booleanExpression CF ACO instruction ACF;
 
 // The basic while loop
 
-whileLoopStatement ::= whileIdentifier CO booleanExpression CF ACO instruction ACF
+whileLoopStatement ::= whileIdentifier CO booleanExpression CF ACO instruction ACF;
 
 // The basic for loop
 
-forLoopStatement ::= forIdentifier CO booleanExpression CF ACO instruction ACF 
+forLoopStatement ::= forIdentifier CO booleanExpression CF ACO instruction ACF ;
 
 // The binding of a value to a variable 
 
 affectationStatement ::= numberIdentifier varName affectationIdentifier expression endLineStatement
 	| textIdentifier varName affectationIdentifier text endLineStatement
-	| booleanIdentifier varName affectationIdentifier booleanExpression endLineStatement
+	| booleanIdentifier varName affectationIdentifier booleanExpression endLineStatement;
 
 // Incrementation of a number (must be applied to a number-containing variable)
 
-incrementStatement ::= varName incrementIdentifier endLineStatement
+incrementStatement ::= varName incrementIdentifier endLineStatement;
 
 // Decrementation of a number (same constraints as the incrementation)
 
-decrementStatement ::= varName decrementIdentifier endLineStatement
+decrementStatement ::= varName decrementIdentifier endLineStatement;
 
 // Used to print something in the console (may be useless without high enough language)
 
 printStatement ::= printIdentifier varName endLineStatement
 	| printIdentifier numberIdentifier endLineStatement
 	| printIdentifier text endLineStatement
-	| printIdentifier booleanExpression endLineStatement
+	| printIdentifier booleanExpression endLineStatement;
 
 // Mathematical operation (non boolean) recursively builded with operators
  
-expression ::= ( expression )
+expression ::= PO expression PF
 	| expression operator expression
 	| numberIdentifier
-	| varName
+	| varName;
 
 //Mathematical operators, used in expressions
 
 operator ::= additionOperator
 	| substractionOperator
 	| multiplicationOperator
-	| divisionOperator
+	| divisionOperator;
 
 //Boolean operation recursively builded with operators
 
 booleanExpression ::= booleanExpression booleanOperator booleanExpression
 	| expression booleanOperator expression
-	| booleanIdentifier 
+	| booleanIdentifier ;
 
 //Boolean operator, used in booleanExpressions
 
@@ -124,4 +122,4 @@ booleanOperator ::= equalIdentifier
 	| differentIdentifier
 	| orIdentifier
 	| andIdentifier
-	| xorIdentifier
+	| xorIdentifier;
