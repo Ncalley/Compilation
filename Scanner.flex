@@ -19,13 +19,25 @@ import java_cup.runtime.Symbol;
 %%
 
 /* regles */
+
+/* terminaux : recognitionLanguageStatement, EOFStatement, void, CO, CF, ACO, ACF,PO, PF, mainStatement, 
+endLineStatement,ifIdentifier, returnType, functionName, returnIdentifier,
+whileIdentifier, forIdentifier, varName, affectationIdentifier, textIdentifier,
+text, booleanIdentifier, numberIdentifier, incrementIdentifier, 
+decrementIdentifier, printIdentifier,additionOperator,substractionOperator, 
+multiplicationOperator, divisionOperator, equalIdentifier, higherThanIdentifier,
+higherEqualThanIdentifier, lesserThanIdentifier, lesserEqualThanIdentifier,
+differentIdentifier, orIdentifier, andIdentifier, xorIdentifier*/
+
 "terminalReconnu"   { return new Symbol(sym.terminalReconnu);}
 
 // exemples
-"."           { return new Symbol(sym.PT);}
-"FEV"         { return new Symbol(sym.FEV);}
-
-{SEP}		  
-.			        { return null;}
+"\["           	{ return new Symbol(sym.CO);}
+"\]"         	{ return new Symbol(sym.CF);}
+" "				{;}
+"\{"         	{ return new Symbol(sym.ACO);}
+"\}"         	{ return new Symbol(sym.ACF);}
+"("         	{ return new Symbol(sym.PO);}
+")"         	{ return new Symbol(sym.PF);}
 
 
