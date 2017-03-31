@@ -75,6 +75,7 @@ function ::= function function //signature de la fonction
 param ::= Type idf
 	| param VIR param
 	|/*nothing*/
+	;
 	
 
 // Something given by a function
