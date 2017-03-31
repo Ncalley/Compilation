@@ -39,7 +39,7 @@ non terminal mainFunction;
 non terminal instruction;
 non terminal ifStatement, whileLoopStatement, forLoopStatement, affectationStatement,incrementStatement, decrementStatement, printStatement;
 non terminal booleanExpression, expression;
-non terminal function, return, wellTypedObject,  
+non terminal function, return, wellTypedObject;  
 non terminal operator, booleanOperator;
 non terminal Type, wellReturnObject;
 
