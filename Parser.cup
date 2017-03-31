@@ -1,53 +1,86 @@
 /* GRAMMAIRE du langage PONY
  * PROJET : CALLEY Nicolas - ADICEOM Audrey - FERRY Emeline - RAGAZZI Inès - FERNANDEZ Joyce
  */ 
+ 
 package fr.ul.miage.exemple.generated;
 
-//!!!! aux crochets, on pose CO = [, CF = ], ACO = { et ACF = }, PO = (, PF = )
+
 
 /* la grammaire */
-terminal recognitionLanguageStatement, EOFStatement, void, CO, CF, ACO, ACF,PO, PF, mainStatement, 
-endLineStatement,ifIdentifier, returnType, functionName, returnIdentifier,
-whileIdentifier, forIdentifier, varName, affectationIdentifier, textIdentifier,
-text, booleanIdentifier, numberIdentifier, incrementIdentifier, 
-decrementIdentifier, printIdentifier,additionOperator,substractionOperator, 
-multiplicationOperator, divisionOperator, equalIdentifier, higherThanIdentifier,
-higherEqualThanIdentifier, lesserThanIdentifier, lesserEqualThanIdentifier,
-differentIdentifier, orIdentifier, andIdentifier, xorIdentifier;
 
-non terminal Pony, content, mainFunction, instruction, ifStatement, whileLoopStatement, 
-forLoopStatement, affectationStatement,incrementStatement, printStatement,
-booleanExpression, function, return, wellTypedObject, expression, 
-decrementStatement, operator, booleanOperator;
+/* Terminals */
+
+
+
+terminal CO, CF, ACO, ACF,PO, PF, VIR, IN; 
+	//on pose CO = [, CF = ], ACO = { et ACF = }, PO = (, PF = ), VIR= ,IN=in
+terminal higherThanIdentifier, higherEqualThanIdentifier, lesserThanIdentifier, lesserEqualThanIdentifier;
+	//>,≥,<,≤
+terminal equalIdentifier, differentIdentifier, orIdentifier, andIdentifier, xorIdentifier;
+	// =,!=,or, and, xor
+terminal additionOperator,substractionOperator, multiplicationOperator, divisionOperator;
+	// +, -, *, /
+terminal recognitionLanguageStatement, mainStatement, endLineStatement; 
+	//recognitionLanguageStatement : begin of Ponny language #Ponny#  , mainStatement: début programme éxecution, endLineStatement : ; (charactère de fin de ligne en java)
+terminal returnType, functionName, varName, number, text, wellReturnObject;
+	//(int, string,..),                    bloc de texte entre ' ', objet de retour
+terminal  affectationIdentifier, incrementIdentifier, decrementIdentifier, printIdentifier, returnIdentifier,whileIdentifier, ifIdentifier,forIdentifier;
+	//<- ; ++; --; affichage; return; while; if; for; 
+terminal booleanIdentifier, numberIdentifier,textIdentifier;
+	//boolean, numerique, String
+
+	
+/*Non terminaux*/
+
+non terminal Pony; //debut 
+non terminal content;
+non terminal mainFunction;
+non terminal instruction;
+non terminal ifStatement, whileLoopStatement, forLoopStatement, affectationStatement,incrementStatement, decrementStatement, printStatement;
+non terminal booleanExpression, expression;
+non terminal function, return, wellTypedObject,  
+non terminal operator, booleanOperator;
+non terminal Type;
 
 start with Pony;
 
 // the language itself.
 
-Pony ::= recognitionLanguageStatement endLineStatement content EOFStatement;
+Pony ::= recognitionLanguageStatement endLineStatement content;
+	//profil : #PONY#; [...]
 
 // A mix composed of the main function and instructions and functions.
 
-content ::= mainFunction
-	| instruction
-	| function mainFunction
-	| mainFunction function
+content ::= mainFunction //on dit que la main fonction c'est la fin, termine 
+	| function content
 	| /*(nothing)*/;
+
 
 // the main function of the program, may use other functions.
 
+
 mainFunction ::= void mainStatement CO CF ACO instruction ACF ;
+	//profil : void main[] { [..] }
 
 // classic function with a given return type (may be void), the return is always
 // at the end of the function for the moment (can't be used inside of a loop).
  
-function ::= function function
-	| returnType functionName CO CF ACO instruction return ACF
+function ::= function function //signature de la fonction
+	| returnType functionName CO param CF ACO instruction return ACF
+	// int f[] {...return int}
 	| void functionName CO CF ACO instruction ACF;
+	//void f[] {...}
+
+param ::= Type varName
+	| param VIR param
+	|/*nothing*/
+	
 
 // Something given by a function
 
-return ::= returnIdentifier wellTypedObject endLineStatement;
+return ::= returnIdentifier wellReturnObject endLineStatement; //on met plutôt un objet ou nameVar ?
+
+
 
 // Any loop, variable manipulation or printStatement
 
@@ -69,13 +102,20 @@ whileLoopStatement ::= whileIdentifier CO booleanExpression CF ACO instruction A
 
 // The basic for loop
 
-forLoopStatement ::= forIdentifier CO booleanExpression CF ACO instruction ACF ;
+forLoopStatement ::= forIdentifier CO booleanExpressionFor CF ACO instruction ACF ;//penser au foreach
+
+booleanExpressionFor ::= varName IN CO number VIR number CF VIR number ;
+	//profil : i in [1,10], 1 <=> i va de 1 à 10 par pas de 1
+
+
+
 
 // The binding of a value to a variable 
 
 affectationStatement ::= numberIdentifier varName affectationIdentifier expression endLineStatement
 	| textIdentifier varName affectationIdentifier text endLineStatement
-	| booleanIdentifier varName affectationIdentifier booleanExpression endLineStatement;
+	| booleanIdentifier varName affectationIdentifier booleanExpression endLineStatement
+	| returnType varName affectationIdentifier functionName CO param CF endLineStatement;
 
 // Incrementation of a number (must be applied to a number-containing variable)
 
@@ -123,3 +163,8 @@ booleanOperator ::= equalIdentifier
 	| orIdentifier
 	| andIdentifier
 	| xorIdentifier;
+
+Type ::= booleanIdentifier
+	| numberIdentifier
+	| textIdentifier
+	;
