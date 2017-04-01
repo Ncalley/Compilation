@@ -41,7 +41,7 @@ non terminal ifStatement, whileLoopStatement, forLoopStatement, affectationState
 non terminal booleanExpression, expression, booleanExpressionFor;
 non terminal function, return, wellTypedObject;  
 non terminal operator, booleanOperator;
-non terminal Type, wellReturnObject;
+non terminal Type, wellReturnObject, param;
 
 start with Pony;
 
