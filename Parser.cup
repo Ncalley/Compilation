@@ -52,7 +52,7 @@ Pony ::= recognitionLanguageStatement endLineStatement content;
 
 // A mix composed of the main function and instructions and functions.
 
-content ::= mainFunction //on dit que la main fonction c'est la fin, termine 
+content ::= mainFunction 
 	| function content
 	| /*(nothing)*/;
 
@@ -66,10 +66,10 @@ mainFunction ::= mainStatement CO CF ACO instruction ACF ;
 // classic function with a given return type (may be void), the return is always
 // at the end of the function for the moment (can't be used inside of a loop).
  
-function ::= function function //signature de la fonction
+function ::= function function 
 	| Type idf CO param CF ACO instruction return ACF
-	// int f[] {...return int}
 	| void idf CO CF ACO instruction ACF;
+	// int f[] {...return int}
 	//void f[] {...}
 
 param ::= Type idf
