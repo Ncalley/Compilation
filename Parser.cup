@@ -101,7 +101,8 @@ instruction ::= instruction instruction
 	| forLoopStatement
 	| affectationStatement endLineStatement
 	| incrementStatement endLineStatement
-	| printStatement endLineStatement;
+	| printStatement endLineStatement
+	| Type idf endLineStatement;
 
 // A simple if
 
