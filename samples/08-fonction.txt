@@ -1,0 +1,15 @@
+/*
+ * Une expression avec un appel
+ */
+#PONY#<3
+Num i <- 1 <3
+Num j <- 2 <3
+
+Num f[Num a]{
+	Return 3 <3
+ }
+
+Main[]{
+	i <- j-(3+f[i+j]) <3
+}
+

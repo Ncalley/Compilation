@@ -1,0 +1,12 @@
+/*
+ * Test generation de code : variables globales
+ */
+#PONY# <3
+Num i <- 0 <3
+Num j <3
+Num k <3
+Main[]{
+	k <- 1 <3
+	j <- k <3
+	k <- i <3
+}
