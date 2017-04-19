@@ -11,30 +11,29 @@ import java_cup.runtime.Symbol;
 %line
 %public
 %cup
+%debug
 
 /* macros */
 
 
-/* Pony, content, mainFunction, instruction, ifStatement, whileLoopStatement, 
-forLoopStatement, affectationStatement,incrementStatement, printStatement,
-booleanExpression, function, return, wellTypedObject, expression, 
-decrementStatement, operator, booleanOperator */
-
-FIN = <3
-MOINS = -[^-]
-name = ([a-zA-Z]+[0-9]*)+
-NUM = -?[0-9]+(\.[0-9]+)?
+NULL = \n|[ \t]|\r|\r\n
+COM = \/\/[^\n]*|\/\*(([^*])|(\*[^/]))*\*\/
+NAME = ([a-zA-Z]+[0-9]*)+
+NUM = [0-9]+(\.[0-9]+)?
 TEXT = \'.*[^\']\'
 BOOL = (true)|(false)
-NULL = \n|[ \t]|\r|\r\n
+
 
 %%
 
 /* regles */
 
 /* "terminalReconnu"   { return new Symbol(sym.terminalReconnu);} */
-{ return new Symbol(sym.);}
+//{ return new Symbol(sym.);}
+
+
 // exemples
+
 "["           	{ return new Symbol(sym.CO);}
 "]"         	{ return new Symbol(sym.CF);}
 "{"         	{ return new Symbol(sym.ACO);}
@@ -42,7 +41,11 @@ NULL = \n|[ \t]|\r|\r\n
 "("         	{ return new Symbol(sym.PO);}
 ")"         	{ return new Symbol(sym.PF);}
 ","				{ return new Symbol(sym.VIR);}
-"in"			{ return new Symbol(sym.IN);}
+"<-"			{ return new Symbol(sym.affectationIdentifier);}
+"+"				{ return new Symbol(sym.additionOperator);}
+"-"				{ return new Symbol(sym.substractionOperator);}
+"*"				{ return new Symbol(sym.multiplicationOperator);}
+"/"				{ return new Symbol(sym.divisionOperator);}
 ">"				{ return new Symbol(sym.higherThanIdentifier);}
 ">="			{ return new Symbol(sym.higherEqualThanIdentifier);}
 "<"				{ return new Symbol(sym.lesserThanIdentifier);}
@@ -52,29 +55,21 @@ NULL = \n|[ \t]|\r|\r\n
 "|"				{ return new Symbol(sym.orIdentifier);}
 "&"				{ return new Symbol(sym.andIdentifier);}
 "||"			{ return new Symbol(sym.xorIdentifier);}
-"<-"			{ return new Symbol(sym.affectationIdentifier);}
-"++"			{ return new Symbol(sym.incrementIdentifier);}
-"--"			{ return new Symbol(sym.decrementIdentifier);}
-"print"			{ return new Symbol(sym.printIdentifier);}
-"return"		{ return new Symbol(returnIdentifier);}
-"while"			{ return new Symbol(sym.whileIdentifier);}
-"if"			{ return new Symbol(sym.ifIdentifier);}
-"for"			{ return new Symbol(sym.forIdentifier);}
-"+"				{ return new Symbol(sym.additionOperator);}
-"-"				{ return new Symbol(sym.substractionOperator);}
-"*"				{ return new Symbol(sym.multiplicationOperator);}
-"/"				{ return new Symbol(sym.divisionOperator);}
+"Not"			{ return new Symbol(sym.notIdentifier);}
+"If"			{ return new Symbol(sym.ifIdentifier);}
+"Else"			{ return new Symbol(sym.elseIdentifier);}
+"While"			{ return new Symbol(sym.whileIdentifier);}
 "#PONY#"		{ return new Symbol(sym.recognitionLanguageStatement);}
-"main"			{ return new Symbol(sym.mainStatement);}
-{FIN}			{ return new Symbol(sym.endLineStatement);}
-{name}			{ return new Symbol(sym.idf);}
-{NUM}			{ return new Symbol(sym.number);}
-{TEXT}			{ return new Symbol(sym.text);}
-{BOOL}			{ return new Symbol(sym.boolean);}
-"void"			{ return new Symbol(sym.void);}
+"Main"			{ return new Symbol(sym.mainStatement);}
+"<3"			{ return new Symbol(sym.endLineStatement);}
 "Bool"			{ return new Symbol(sym.booleanIdentifier);}
 "Num"			{ return new Symbol(sym.numberIdentifier);}
 "Text"			{ return new Symbol(sym.textIdentifier);}
-{NULL}				{;}
-///Est-ce qu'il faut mettre les antislash??
-
+"Return"		{ return new Symbol(sym.returnIdentifier);}
+"Void"			{ return new Symbol(sym.vide);}
+{NAME}			{ return new Symbol(sym.idf);}
+{NUM}			{ return new Symbol(sym.number);}
+{TEXT}			{ return new Symbol(sym.text);}
+{BOOL}			{ return new Symbol(sym.bool);}
+{NULL}			{;}
+{COM}			{;}  

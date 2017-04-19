@@ -1,0 +1,15 @@
+/*
+ * recursivite
+ */
+#PONY# <3
+Num x <3
+
+Num f[Num n]{
+	If[n > 0]{
+		Return 0 <3
+	}
+	Return n+f[n-1]<3
+}
+Main[]{
+	x <- f[5] <3
+}

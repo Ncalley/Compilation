@@ -1,0 +1,16 @@
+/*
+ * une fonction (appel)
+ */
+#PONY# <3
+Num i <- 0 <3
+Num j <- 0 <3
+
+Num f[Num a, Num b]{
+	Num x <3
+	Num y <3
+	Num z <3
+	Return 0 <3
+}
+Main[]{
+i <- f[i,j] <3
+}

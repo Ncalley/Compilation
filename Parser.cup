@@ -1,5 +1,5 @@
 /* GRAMMAIRE du langage PONY
- * PROJET : CALLEY Nicolas - ADICEOM Audrey - FERRY Emeline - RAGAZZI Inès - FERNANDEZ Joyce
+ * PROJET : CALLEY Nicolas - ADICEOM Audrey - FERRY Emeline - RAGAZZI InÃ¨s - FERNANDEZ Joyce
  */ 
  
 package fr.ul.miage.exemple.generated;
@@ -8,165 +8,158 @@ package fr.ul.miage.exemple.generated;
 
 /* la grammaire */
 
-/* Terminals */
+terminal recognitionLanguageStatement, mainStatement, endLineStatement;
+terminal CO, CF, ACO, ACF, PO, PF, VIR;
+terminal additionOperator,substractionOperator, multiplicationOperator, divisionOperator;
+	// +, -, *, /
 
-
-
-terminal CO, CF, ACO, ACF,PO, PF, VIR, IN; 
-	//on pose CO = [, CF = ], ACO = { et ACF = }, PO = (, PF = ), VIR= ,IN=in
 terminal higherThanIdentifier, higherEqualThanIdentifier, lesserThanIdentifier, lesserEqualThanIdentifier;
 	//>,≥,<,≤
 terminal equalIdentifier, differentIdentifier, orIdentifier, andIdentifier, xorIdentifier;
 	// =,!=,or, and, xor
-terminal  affectationIdentifier, incrementIdentifier, decrementIdentifier, printIdentifier, returnIdentifier,whileIdentifier, ifIdentifier,forIdentifier;
-	//<- ; ++; --; affichage; return; while; if; for; 
-terminal additionOperator,substractionOperator, multiplicationOperator, divisionOperator;
-	// +, -, *, /
-terminal recognitionLanguageStatement, mainStatement, endLineStatement; 
-	//recognitionLanguageStatement : begin of Ponny language #Ponny#  , mainStatement: début programme éxecution, endLineStatement : ; (charactère de fin de ligne en java)
-terminal idf, number, text, boolean;
-	//                                  bloc de texte entre ' ', objet de retour
 
-terminal booleanIdentifier, numberIdentifier,textIdentifier, void;
-	//boolean, numerique, String
+terminal notIdentifier;
+terminal idf, number, vide, bool, text; // nom de variable, commence forcément par une minuscule
+terminal numberIdentifier, booleanIdentifier, textIdentifier;
+	//boolean, numerique, String, rien
+terminal affectationIdentifier, returnIdentifier, ifIdentifier, elseIdentifier, whileIdentifier;
 
-	
-/*Non terminaux*/
+non terminal Pony;
+non terminal Content;
+non terminal MainFunction;
+non terminal Instruction;
+non terminal AffectationStatement, AffectationSecondPart, IfStatement, ElseStatement, WhileLoopStatement;
+non terminal IfReturn;
+//non terminal Type;
+non terminal Expression, BooleanExpression;
+non terminal Operator, BooleanOperator;
+non terminal Function, Param, UnTypedParam, TextFunction, BoolFunction, FunctionStatement, TextRecursive;
 
-non terminal Pony; //debut 
-non terminal content;
-non terminal mainFunction;
-non terminal instruction;
-non terminal ifStatement, whileLoopStatement, forLoopStatement, affectationStatement,incrementStatement, decrementStatement, printStatement;
-non terminal booleanExpression, expression, booleanExpressionFor;
-non terminal function, return, wellTypedObject;  
-non terminal operator, booleanOperator;
-non terminal Type, wellReturnObject, param;
 
 start with Pony;
 
 // the language itself.
 
-Pony ::= recognitionLanguageStatement endLineStatement content;
-	//profil : #PONY#; [...]
+
+Pony ::= recognitionLanguageStatement endLineStatement Content;
 
 // A mix composed of the main function and instructions and functions.
 
-content ::= mainFunction 
-	| function content
+Content ::= MainFunction
+	| AffectationStatement endLineStatement Content 
+	| Function Content
+	| TextFunction Content
+	| BoolFunction Content
 	| /*(nothing)*/;
 
 
 // the main function of the program, may use other functions.
 
 
-mainFunction ::= mainStatement CO CF ACO instruction ACF ;
+
+MainFunction ::= mainStatement CO CF ACO Instruction ACF ;
 	//profil :  main[] { [..] }
 
 // classic function with a given return type (may be void), the return is always
 // at the end of the function for the moment (can't be used inside of a loop).
  
-function ::= function function 
-	| Type idf CO param CF ACO instruction return ACF
-	| void idf CO CF ACO instruction ACF;
-	// int f[] {...return int}
-	//void f[] {...}
 
-param ::= Type idf
-	| param VIR param
+TextFunction ::= textIdentifier idf CO Param CF ACO Instruction returnIdentifier TextRecursive endLineStatement ACF
+	;
+
+BoolFunction ::= booleanIdentifier idf CO Param CF ACO Instruction returnIdentifier BooleanExpression endLineStatement ACF
+	| booleanIdentifier idf CO Param CF ACO Instruction returnIdentifier idf endLineStatement ACF
+	;
+
+Function ::= numberIdentifier idf CO Param CF ACO Instruction returnIdentifier Expression endLineStatement ACF
+	| vide idf CO CF ACO Instruction ACF;
+
+FunctionStatement ::= idf CO UnTypedParam CF ;
+
+TextRecursive ::= text
+	| text additionOperator FunctionStatement;
+
+
+Param ::= numberIdentifier Expression VIR Param
+	| booleanIdentifier bool VIR Param
+	| textIdentifier text VIR Param
+	| numberIdentifier Expression
+	| booleanIdentifier bool
+	| textIdentifier text
 	|/*nothing*/
 	;
 	
-
-// Something given by a function
-
-return ::= returnIdentifier wellReturnObject endLineStatement; 
-
-wellReturnObject ::= idf
-	| boolean
+UnTypedParam ::= Expression VIR UnTypedParam
+	| bool VIR UnTypedParam
+	| text VIR UnTypedParam
+	| Expression
+	| bool
 	| text
-	| number
-	| /*nothing*/
-	;
-
-
-
-
+	| /* nothing */;
 
 // Any loop, variable manipulation or printStatement
 
-instruction ::= instruction instruction
-	| ifStatement
-	| whileLoopStatement
-	| forLoopStatement
-	| affectationStatement endLineStatement
-	| incrementStatement endLineStatement
-	| printStatement endLineStatement
-	| Type idf endLineStatement;
-
-// A simple if
-
-ifStatement ::= ifIdentifier CO booleanExpression CF ACO instruction ACF;
-
-// The basic while loop
-
-whileLoopStatement ::= whileIdentifier CO booleanExpression CF ACO instruction ACF;
-
-// The basic for loop
-
-forLoopStatement ::= forIdentifier CO booleanExpressionFor CF ACO instruction ACF ;//penser au foreach
-
-booleanExpressionFor ::= idf IN CO number VIR number CF VIR number ;
-	//profil : i in [1,10], 1 <=> i va de 1 à 10 par pas de 1
-
-
-
+Instruction ::= AffectationStatement endLineStatement Instruction
+	| IfStatement Instruction
+	| WhileLoopStatement Instruction
+	| /* nothing */ 
+	;
 
 // The binding of a value to a variable 
 
-affectationStatement ::= numberIdentifier idf affectationIdentifier expression endLineStatement
-	| textIdentifier idf affectationIdentifier text endLineStatement
-	| booleanIdentifier idf affectationIdentifier booleanExpression endLineStatement
-	| Type idf affectationIdentifier idf CO param CF endLineStatement;
+AffectationStatement ::= numberIdentifier idf AffectationSecondPart
+	| idf affectationIdentifier Expression
+;
 
-// Incrementation of a number (must be applied to a number-containing variable)
-
-incrementStatement ::= idf incrementIdentifier endLineStatement;
-
-// Decrementation of a number (same constraints as the incrementation)
-
-decrementStatement ::= idf decrementIdentifier endLineStatement;
-
-// Used to print something in the console (may be useless without high enough language)
-
-printStatement ::= printIdentifier idf endLineStatement
-	| printIdentifier number endLineStatement
-	| printIdentifier text endLineStatement
-	| printIdentifier booleanExpression endLineStatement;
+AffectationSecondPart ::= affectationIdentifier Expression
+	| /*(nothing)*/;
 
 // Mathematical operation (non boolean) recursively builded with operators
  
-expression ::= PO expression PF
-	| expression operator expression
+Expression ::= PO Expression PF 
+	| PO Expression PF  Operator Expression
+	| number Operator Expression
+	| idf Operator Expression
+	| FunctionStatement Operator Expression 
 	| number
-	| idf;
+	| idf
+	| FunctionStatement
+	;
 
 //Mathematical operators, used in expressions
 
-operator ::= additionOperator
+Operator ::= additionOperator
 	| substractionOperator
 	| multiplicationOperator
 	| divisionOperator;
 
+// A simple if
+
+IfStatement ::= ifIdentifier CO BooleanExpression CF ACO Instruction IfReturn ACF
+	|  ifIdentifier CO BooleanExpression CF ACO Instruction IfReturn ACF ElseStatement;
+	//profil : if [i<2]{...}
+
+ElseStatement ::= elseIdentifier ACO Instruction IfReturn ACF;
+
+IfReturn ::= returnIdentifier TextRecursive endLineStatement
+	| returnIdentifier BooleanExpression endLineStatement
+	| returnIdentifier Expression endLineStatement
+	| /* nothing*/;
+
 //Boolean operation recursively builded with operators
 
-booleanExpression ::= booleanExpression booleanOperator booleanExpression
-	| expression booleanOperator expression
-	| boolean ;
+
+BooleanExpression ::= bool
+	| Expression BooleanOperator Expression
+	| notIdentifier BooleanExpression
+	| bool equalIdentifier BooleanExpression
+	| bool differentIdentifier BooleanExpression
+		;
+
 
 //Boolean operator, used in booleanExpressions
 
-booleanOperator ::= equalIdentifier
+BooleanOperator ::= equalIdentifier
 	| higherThanIdentifier
 	| higherEqualThanIdentifier
 	| lesserThanIdentifier
@@ -175,8 +168,9 @@ booleanOperator ::= equalIdentifier
 	| orIdentifier
 	| andIdentifier
 	| xorIdentifier;
+  
+// The basic while loop
 
-Type ::= booleanIdentifier
-	| numberIdentifier
-	| textIdentifier
-	;
+WhileLoopStatement ::= whileIdentifier CO BooleanExpression CF ACO Instruction ACF;
+	//profil : while [i<2]{...}
+
