@@ -1,19 +1,23 @@
 /* GRAMMAIRE du langage PONY
  * PROJET : CALLEY Nicolas - ADICEOM Audrey - FERRY Emeline - RAGAZZI InÃ¨s - FERNANDEZ Joyce
  */ 
+ 
 package fr.ul.miage.exemple.generated;
 
-//!!!! aux crochets, on pose CO = [, CF = ], ACO = { et ACF = }, PO = (, PF = )
+
 
 /* la grammaire */
+
 terminal recognitionLanguageStatement, mainStatement, endLineStatement;
 terminal CO, CF, ACO, ACF, PO, PF, VIR;
 terminal additionOperator,substractionOperator, multiplicationOperator, divisionOperator;
 	// +, -, *, /
+
 terminal higherThanIdentifier, higherEqualThanIdentifier, lesserThanIdentifier, lesserEqualThanIdentifier;
 	//>,≥,<,≤
 terminal equalIdentifier, differentIdentifier, orIdentifier, andIdentifier, xorIdentifier;
 	// =,!=,or, and, xor
+
 terminal notIdentifier;
 terminal idf, number, vide, bool, text; // nom de variable, commence forcément par une minuscule
 terminal numberIdentifier, booleanIdentifier, textIdentifier;
@@ -36,6 +40,7 @@ start with Pony;
 
 // the language itself.
 
+
 Pony ::= recognitionLanguageStatement endLineStatement Content;
 
 // A mix composed of the main function and instructions and functions.
@@ -47,7 +52,9 @@ Content ::= MainFunction
 	| BoolFunction Content
 	| /*(nothing)*/;
 
+
 // the main function of the program, may use other functions.
+
 
 
 MainFunction ::= mainStatement CO CF ACO Instruction ACF ;
@@ -56,6 +63,7 @@ MainFunction ::= mainStatement CO CF ACO Instruction ACF ;
 // classic function with a given return type (may be void), the return is always
 // at the end of the function for the moment (can't be used inside of a loop).
  
+
 TextFunction ::= textIdentifier idf CO Param CF ACO Instruction returnIdentifier TextRecursive endLineStatement ACF
 	;
 
@@ -140,12 +148,14 @@ IfReturn ::= returnIdentifier TextRecursive endLineStatement
 
 //Boolean operation recursively builded with operators
 
+
 BooleanExpression ::= bool
 	| Expression BooleanOperator Expression
 	| notIdentifier BooleanExpression
 	| bool equalIdentifier BooleanExpression
 	| bool differentIdentifier BooleanExpression
 		;
+
 
 //Boolean operator, used in booleanExpressions
 
@@ -158,7 +168,7 @@ BooleanOperator ::= equalIdentifier
 	| orIdentifier
 	| andIdentifier
 	| xorIdentifier;
-
+  
 // The basic while loop
 
 WhileLoopStatement ::= whileIdentifier CO BooleanExpression CF ACO Instruction ACF;
