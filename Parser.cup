@@ -4,9 +4,26 @@
  
 package fr.ul.miage.exemple.generated;
 
+import java.util.LinkedList;
+
+
+action code {: Tree arbre_prgme = new Tree("PROGRAMME",null,null,null,null,null,null);
+				LinkedList <Tree> liste_Inter= new LinkedList<Tree>();
+				Integer rangIf=0; //pour incrémenter les if et tout
+				LinkedList <Tree> liste_InterText= new LinkedList<Tree>();
+				
+				ArrayList<Noeud> listeTemporaire2 = new ArrayList<Noeud>();
+				ArrayList<Noeud> boucle1 = new ArrayList<Noeud>();
+				ArrayList<Noeud> boucle2 = new ArrayList<Noeud>();
+				ArrayList<Noeud> listeFonction = new ArrayList<Noeud>();
+				ArrayList<String> listeParametre = new ArrayList<String>();
+			:}
+				;
+
 
 
 /* la grammaire */
+
 
 terminal recognitionLanguageStatement, mainStatement, endLineStatement;
 terminal CO, CF, ACO, ACF, PO, PF, VIR;
@@ -27,19 +44,21 @@ terminal affectationIdentifier, returnIdentifier, ifIdentifier, elseIdentifier, 
 non terminal Pony;
 non terminal Content;
 non terminal MainFunction;
-non terminal Instruction;
-non terminal AffectationStatement, AffectationSecondPart, IfStatement, ElseStatement, WhileLoopStatement;
-non terminal IfReturn;
+
+non terminal LinkedList <Tree> Instruction,ElseStatement, TextRecursive;
+non terminal AffectationSecondPart , WhileLoopStatement;
 //non terminal Type;
-non terminal Expression, BooleanExpression;
+non terminal Expression, 
+non terminal Tree BooleanExpression,AffectationStatement,IfStatement,IfReturn;
 non terminal Operator, BooleanOperator;
-non terminal Function, Param, UnTypedParam, TextFunction, BoolFunction, FunctionStatement, TextRecursive;
+non terminal Function, Param, UnTypedParam, TextFunction, BoolFunction, FunctionStatement;
+
+
 
 
 start with Pony;
 
 // the language itself.
-
 
 Pony ::= recognitionLanguageStatement endLineStatement Content;
 
@@ -56,8 +75,16 @@ Content ::= MainFunction
 // the main function of the program, may use other functions.
 
 
+MainFunction ::= mainStatement : main_fct CO CF ACO Instruction:liste_instruction ACF 
+		{:
+			Data d=new Data("Main","fonction","void",0,0,0,0);
+			Tree t1=new Tree("MainFunction","Function",1,d,null);  
+			arbre_prgme.tds.add(d); 
+			arbre_prgme.l.add(t1)
+			t1.l.add(liste_instruction)
+		:}
+		;
 
-MainFunction ::= mainStatement CO CF ACO Instruction ACF ;
 	//profil :  main[] { [..] }
 
 // classic function with a given return type (may be void), the return is always
@@ -76,7 +103,16 @@ Function ::= numberIdentifier idf CO Param CF ACO Instruction returnIdentifier E
 
 FunctionStatement ::= idf CO UnTypedParam CF ;
 
-TextRecursive ::= text
+
+TextRecursive ::= text : t
+	{: 
+			liste_InterText.removeAll()
+			Data d=new Data("Text","text","void",null,null,null,null);
+			Tree t=new Tree("Text","text",null,d,null); 
+			liste_InterText.add(t);
+			
+			RESULT = liste_InterText;
+		:}
 	| text additionOperator FunctionStatement;
 
 
@@ -99,20 +135,74 @@ UnTypedParam ::= Expression VIR UnTypedParam
 
 // Any loop, variable manipulation or printStatement
 
-Instruction ::= AffectationStatement endLineStatement Instruction
-	| IfStatement Instruction
-	| WhileLoopStatement Instruction
+Instruction ::= AffectationStatement : a endLineStatement Instruction : inst
+		{: 
+			liste_Inter.removeAll()
+			liste_Inter.add(a)
+			for (Tree t : inst) {
+				if (t != null) {
+					liste_Inter.add(t);
+				}
+			}
+			RESULT = liste_Inter;
+		:}
+	| IfStatement :if Instruction:inst
+		{: 
+			liste_Inter.removeAll()
+			liste_Inter.add(if)
+			for (Tree t : inst) {
+				if (t != null) {
+					liste_Inter.add(t);
+				}
+			}
+			RESULT = liste_Inter;
+		:}
+	| WhileLoopStatement:w Instruction:inst
+	 	{: 
+			liste_Inter.removeAll()
+			liste_Inter.add(w)
+			for (Tree t : inst) {
+				if (t != null) {
+					liste_Inter.add(t);
+				}
+			}
+			RESULT = liste_Inter;
+		:}
 	| /* nothing */ 
-	;
+	;//RESULT de la liste temporaire
 
 // The binding of a value to a variable 
 
-AffectationStatement ::= numberIdentifier idf AffectationSecondPart
+AffectationStatement ::= numberIdentifier:a idf:identifiant AffectationSecondPart
+		{: 
+			Data d=new Data(identifiant,"globale/locale","Num",0,0,0,0);
+			t1=new Tree("AffectationStatement","",null,d,null);  
+			first_part=new Tree(identifiant,"",null,null,null);  
+			arbre_prgme.tds.add(d); 
+			arbre_prgme.l.add(t1)
+		:}
+
 	| idf affectationIdentifier Expression
 ;
 
 AffectationSecondPart ::= affectationIdentifier Expression
 	| /*(nothing)*/;
+
+	
+AffectationStatement ::= numberIdentifier:a idf:identifiant affectationIdentifier Expression:e
+		{: 
+			Data d=new Data(identifiant,"globale/locale","Num",0,0,RECUPERER INFO DE EXPRESSION,0);
+			t1=new Tree("AffectationStatement","",null,d,null);  
+			first_part=new Tree(identifiant,"",null,null,null);  
+			sec_part=new Tree(RECUPERER INFO DE EXPRESSION,"",null,null,null);  
+			t1.l.add(first_part);
+			t1.l.add(sec_part);
+			RESULT = t1;
+		:}
+	| idf affectationIdentifier Expression
+	| numberIdentifier:a idf:identifiant
+;
+
 
 // Mathematical operation (non boolean) recursively builded with operators
  
@@ -135,13 +225,61 @@ Operator ::= additionOperator
 
 // A simple if
 
-IfStatement ::= ifIdentifier CO BooleanExpression CF ACO Instruction IfReturn ACF
-	|  ifIdentifier CO BooleanExpression CF ACO Instruction IfReturn ACF ElseStatement;
+
+IfStatement ::= ifIdentifier CO BooleanExpression:condit CF ACO Instruction :inst IfReturn:r ACF
+		{: 
+			Data d=new Data("If","","",0,0,0,0);
+			Tree if=new Tree("If","",rangIf+1,d,null);  
+			if.l.add(condit);
+			Data d_then=new Data("then","","",0,0,0,0);
+			Tree then=new Tree("then","",rangIf+1,d_condition,null);
+			for (Tree t : inst) {
+				if (t != null) {
+					then.l.add(t);
+				}
+			}
+			then.l.add(r);
+			
+			if.l.add(condition);
+			if.l.add(then);
+			RESULT = if;
+		:}
+	|  ifIdentifier CO BooleanExpression CF ACO Instruction:inst IfReturn:r ACF ElseStatement:else;
+		{: 
+			Data d=new Data("If","","",0,0,0,rangIf+1);
+			Tree ifElse=new Tree("If","",0,d,null);  
+			if.l.add(condit);
+			Data d_then=new Data("then","","",0,0,0,0);
+			Tree then=new Tree("then","",1,d_condition,null);
+			then.l.add(inst)
+			Data d_else=new Data("else","","",0,0,0,rangIf+1);
+			Tree else=new Tree("else","",0,d_condition,null);
+			else.l.add(else)
+			if.l.add(condition);
+			if.l.add(then);
+			if.l.add(else);
+			RESULT = ifElse;
+		:}
 	//profil : if [i<2]{...}
 
-ElseStatement ::= elseIdentifier ACO Instruction IfReturn ACF;
+ElseStatement ::= elseIdentifier ACO Instruction:inst IfReturn ACF;
+		{: 
+			RESULT = inst ;
+		:}
 
-IfReturn ::= returnIdentifier TextRecursive endLineStatement
+IfReturn ::= returnIdentifier TextRecursive:x endLineStatement
+		{: 
+			Data d=new Data("Return","","",0,0,0,0);
+			Tree retIf=new Tree("ReturnIf","",0,d,rangIf+1);  
+			for (Tree t : x) {
+				if (t != null) {
+					retIf.l.add(t);
+				}
+			}
+			
+			RESULT = retIf;
+		:}
+
 	| returnIdentifier BooleanExpression endLineStatement
 	| returnIdentifier Expression endLineStatement
 	| /* nothing*/;
@@ -170,6 +308,7 @@ BooleanOperator ::= equalIdentifier
 	| xorIdentifier;
   
 // The basic while loop
+
 
 WhileLoopStatement ::= whileIdentifier CO BooleanExpression CF ACO Instruction ACF;
 	//profil : while [i<2]{...}
