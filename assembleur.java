@@ -207,7 +207,9 @@ public class assembleur {
 	}
 	public String generer_ecrire(Tree a){
 		String res="";
-		res+= "";
+		res+= "PUSH("+t.val+")"
+			+" POP(R0) "; // ne fonctionne pas car la valeur val peut etre un String
+		res+= "ST(R0,0,R1)";
 		return res;
 	}
 }
