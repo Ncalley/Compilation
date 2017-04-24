@@ -1,170 +1,296 @@
 /* GRAMMAIRE du langage PONY
- * PROJET : CALLEY Nicolas - ADICEOM Audrey - FERRY Emeline - RAGAZZI Inès - FERNANDEZ Joyce
+ * PROJET : CALLEY Nicolas - ADICEOM Audrey - FERRY Emeline - RAGAZZI InÃ¨s - FERNANDEZ Joyce
  */ 
  
 package fr.ul.miage.exemple.generated;
 
+import java.util.LinkedList;
+
+
+action code {: Tree arbre_prgme = new Tree("PROGRAMME",null,null,null,null,null,null);
+				LinkedList <Tree> liste_Inter= new LinkedList<Tree>();
+				Integer rangIf=0; //pour incrémenter les if et tout
+				LinkedList <Tree> liste_InterText= new LinkedList<Tree>();
+				
+				ArrayList<Noeud> listeTemporaire2 = new ArrayList<Noeud>();
+				ArrayList<Noeud> boucle1 = new ArrayList<Noeud>();
+				ArrayList<Noeud> boucle2 = new ArrayList<Noeud>();
+				ArrayList<Noeud> listeFonction = new ArrayList<Noeud>();
+				ArrayList<String> listeParametre = new ArrayList<String>();
+			:}
+				;
 
 
 /* la grammaire */
 
-/* Terminals */
+terminal recognitionLanguageStatement, mainStatement, endLineStatement;
+terminal CO, CF, ACO, ACF, PO, PF, VIR;
+terminal additionOperator,substractionOperator, multiplicationOperator, divisionOperator;
+	// +, -, *, /
 
-
-
-terminal CO, CF, ACO, ACF,PO, PF, VIR, IN; 
-	//on pose CO = [, CF = ], ACO = { et ACF = }, PO = (, PF = ), VIR= ,IN=in
 terminal higherThanIdentifier, higherEqualThanIdentifier, lesserThanIdentifier, lesserEqualThanIdentifier;
 	//>,≥,<,≤
 terminal equalIdentifier, differentIdentifier, orIdentifier, andIdentifier, xorIdentifier;
 	// =,!=,or, and, xor
-terminal  affectationIdentifier, incrementIdentifier, decrementIdentifier, printIdentifier, returnIdentifier,whileIdentifier, ifIdentifier,forIdentifier;
-	//<- ; ++; --; affichage; return; while; if; for; 
-terminal additionOperator,substractionOperator, multiplicationOperator, divisionOperator;
-	// +, -, *, /
-terminal recognitionLanguageStatement, mainStatement, endLineStatement; 
-	//recognitionLanguageStatement : begin of Ponny language #Ponny#  , mainStatement: début programme éxecution, endLineStatement : ; (charactère de fin de ligne en java)
-terminal idf, number, text, boolean;
-	//                                  bloc de texte entre ' ', objet de retour
 
-terminal booleanIdentifier, numberIdentifier,textIdentifier, void;
-	//boolean, numerique, String
+terminal notIdentifier;
+terminal idf, number, vide, bool, text; // nom de variable, commence forcément par une minuscule
+terminal numberIdentifier, booleanIdentifier, textIdentifier;
+	//boolean, numerique, String, rien
+terminal affectationIdentifier, returnIdentifier, ifIdentifier, elseIdentifier, whileIdentifier;
 
-	
-/*Non terminaux*/
+non terminal Pony;
+non terminal Content;
+non terminal MainFunction;
+non terminal LinkedList <Tree> Instruction,ElseStatement, TextRecursive;
+non terminal AffectationSecondPart , WhileLoopStatement;
+//non terminal Type;
+non terminal Expression, 
+non terminal Tree BooleanExpression,AffectationStatement,IfStatement,IfReturn;
+non terminal Operator, BooleanOperator;
+non terminal Function, Param, UnTypedParam, TextFunction, BoolFunction, FunctionStatement;
 
-non terminal Pony; //debut 
-non terminal content;
-non terminal mainFunction;
-non terminal instruction;
-non terminal ifStatement, whileLoopStatement, forLoopStatement, affectationStatement,incrementStatement, decrementStatement, printStatement;
-non terminal booleanExpression, expression;
-non terminal function, return, wellTypedObject,  
-non terminal operator, booleanOperator;
-non terminal Type, wellReturnObject;
+
 
 start with Pony;
 
 // the language itself.
 
-Pony ::= recognitionLanguageStatement endLineStatement content;
-	//profil : #PONY#; [...]
+
+Pony ::= recognitionLanguageStatement endLineStatement Content ;
+	
 
 // A mix composed of the main function and instructions and functions.
 
-content ::= mainFunction //on dit que la main fonction c'est la fin, termine 
-	| function content
+Content ::= MainFunction 
+	| AffectationStatement endLineStatement Content
+		
+	| Function: t1 Content {: t1.nomIdentificateur="fonction"; t1.ref.t.type="Num"; t.l.add(t1):}
+	| TextFunction: t1 Content {: t1.nomIdentificateur="fonction"; t1.ref.t.type="Text"; t.l.add(t1):}
+	| BoolFunction:t1 Content {: t1.nomIdentificateur="fonction"; t1.ref.t.type="Bool"; t.l.add(t1):}
 	| /*(nothing)*/;
 
 
 // the main function of the program, may use other functions.
 
 
-mainFunction ::= mainStatement CO CF ACO instruction ACF ;
+
+MainFunction ::= mainStatement : main_fct CO CF ACO Instruction:liste_instruction ACF 
+		{:
+			Data d=new Data("Main","fonction","void",0,0,0,0);
+			Tree t1=new Tree("MainFunction","Function",1,d,null);  
+			arbre_prgme.tds.add(d); 
+			arbre_prgme.l.add(t1)
+			t1.l.add(liste_instruction)
+		:}
+		;
 	//profil :  main[] { [..] }
 
 // classic function with a given return type (may be void), the return is always
 // at the end of the function for the moment (can't be used inside of a loop).
  
-function ::= function function //signature de la fonction
-	| Type idf CO param CF ACO instruction return ACF
-	// int f[] {...return int}
-	| void idf CO CF ACO instruction ACF;
-	//void f[] {...}
 
-param ::= Type idf
-	| param VIR param
-	|/*nothing*/
-	
-
-// Something given by a function
-
-return ::= returnIdentifier wellReturnObject endLineStatement; 
-
-wellReturnObject ::= idf
-	| boolean
-	| text
-	| number
-	| /*nothing*/
+TextFunction ::= textIdentifier idf CO Param CF ACO Instruction returnIdentifier TextRecursive endLineStatement ACF
 	;
 
+BoolFunction ::= booleanIdentifier idf CO Param CF ACO Instruction returnIdentifier BooleanExpression endLineStatement ACF
+	| booleanIdentifier idf CO Param CF ACO Instruction returnIdentifier idf endLineStatement ACF
+	;
+
+Function ::= numberIdentifier idf CO Param CF ACO Instruction returnIdentifier Expression endLineStatement ACF
+	| vide idf CO CF ACO Instruction ACF;
+
+FunctionStatement ::= idf CO UnTypedParam CF ;
+
+TextRecursive ::= text : t
+	{: 
+			liste_InterText.removeAll()
+			Data d=new Data("Text","text","void",null,null,null,null);
+			Tree t=new Tree("Text","text",null,d,null); 
+			liste_InterText.add(t);
+			
+			RESULT = liste_InterText;
+		:}
+	| text additionOperator FunctionStatement;
 
 
-
+Param ::= numberIdentifier Expression VIR Param
+	| booleanIdentifier bool VIR Param
+	| textIdentifier text VIR Param
+	| numberIdentifier Expression
+	| booleanIdentifier bool
+	| textIdentifier text
+	|/*nothing*/
+	;
+	
+UnTypedParam ::= Expression VIR UnTypedParam
+	| bool VIR UnTypedParam
+	| text VIR UnTypedParam
+	| Expression
+	| bool
+	| text
+	| /* nothing */;
 
 // Any loop, variable manipulation or printStatement
 
-instruction ::= instruction instruction
-	| ifStatement
-	| whileLoopStatement
-	| forLoopStatement
-	| affectationStatement endLineStatement
-	| incrementStatement endLineStatement
-	| printStatement endLineStatement;
-
-// A simple if
-
-ifStatement ::= ifIdentifier CO booleanExpression CF ACO instruction ACF;
-
-// The basic while loop
-
-whileLoopStatement ::= whileIdentifier CO booleanExpression CF ACO instruction ACF;
-
-// The basic for loop
-
-forLoopStatement ::= forIdentifier CO booleanExpressionFor CF ACO instruction ACF ;//penser au foreach
-
-booleanExpressionFor ::= idf IN CO number VIR number CF VIR number ;
-	//profil : i in [1,10], 1 <=> i va de 1 à 10 par pas de 1
-
-
-
+Instruction ::= AffectationStatement : a endLineStatement Instruction : inst
+		{: 
+			liste_Inter.removeAll()
+			liste_Inter.add(a)
+			for (Tree t : inst) {
+				if (t != null) {
+					liste_Inter.add(t);
+				}
+			}
+			RESULT = liste_Inter;
+		:}
+	| IfStatement :if Instruction:inst
+		{: 
+			liste_Inter.removeAll()
+			liste_Inter.add(if)
+			for (Tree t : inst) {
+				if (t != null) {
+					liste_Inter.add(t);
+				}
+			}
+			RESULT = liste_Inter;
+		:}
+	| WhileLoopStatement:w Instruction:inst
+	 	{: 
+			liste_Inter.removeAll()
+			liste_Inter.add(w)
+			for (Tree t : inst) {
+				if (t != null) {
+					liste_Inter.add(t);
+				}
+			}
+			RESULT = liste_Inter;
+		:}
+	| /* nothing */ 
+	;//RESULT de la liste temporaire
 
 // The binding of a value to a variable 
 
-affectationStatement ::= numberIdentifier idf affectationIdentifier expression endLineStatement
-	| textIdentifier idf affectationIdentifier text endLineStatement
-	| booleanIdentifier idf affectationIdentifier booleanExpression endLineStatement
-	| Type idf affectationIdentifier idf CO param CF endLineStatement;
+AffectationStatement ::= numberIdentifier:a idf:identifiant AffectationSecondPart
+		{: 
+			Data d=new Data(identifiant,"globale/locale","Num",0,0,0,0);
+			t1=new Tree("AffectationStatement","",null,d,null);  
+			first_part=new Tree(identifiant,"",null,null,null);  
+			arbre_prgme.tds.add(d); 
+			arbre_prgme.l.add(t1)
+		:}
+	| idf affectationIdentifier Expression
+;
 
-// Incrementation of a number (must be applied to a number-containing variable)
-
-incrementStatement ::= idf incrementIdentifier endLineStatement;
-
-// Decrementation of a number (same constraints as the incrementation)
-
-decrementStatement ::= idf decrementIdentifier endLineStatement;
-
-// Used to print something in the console (may be useless without high enough language)
-
-printStatement ::= printIdentifier idf endLineStatement
-	| printIdentifier number endLineStatement
-	| printIdentifier text endLineStatement
-	| printIdentifier booleanExpression endLineStatement;
+AffectationSecondPart ::= affectationIdentifier Expression
+	| /*(nothing)*/;
+	
+AffectationStatement ::= numberIdentifier:a idf:identifiant affectationIdentifier Expression:e
+		{: 
+			Data d=new Data(identifiant,"globale/locale","Num",0,0,RECUPERER INFO DE EXPRESSION,0);
+			t1=new Tree("AffectationStatement","",null,d,null);  
+			first_part=new Tree(identifiant,"",null,null,null);  
+			sec_part=new Tree(RECUPERER INFO DE EXPRESSION,"",null,null,null);  
+			t1.l.add(first_part);
+			t1.l.add(sec_part);
+			RESULT = t1;
+		:}
+	| idf affectationIdentifier Expression
+	| numberIdentifier:a idf:identifiant
+;
 
 // Mathematical operation (non boolean) recursively builded with operators
  
-expression ::= PO expression PF
-	| expression operator expression
+Expression ::= PO Expression PF 
+	| PO Expression PF  Operator Expression
+	| number Operator Expression
+	| idf Operator Expression
+	| FunctionStatement Operator Expression 
 	| number
-	| idf;
+	| idf
+	| FunctionStatement
+	;
 
 //Mathematical operators, used in expressions
 
-operator ::= additionOperator
+Operator ::= additionOperator
 	| substractionOperator
 	| multiplicationOperator
 	| divisionOperator;
 
+// A simple if
+
+IfStatement ::= ifIdentifier CO BooleanExpression:condit CF ACO Instruction :inst IfReturn:r ACF
+		{: 
+			Data d=new Data("If","","",0,0,0,0);
+			Tree if=new Tree("If","",rangIf+1,d,null);  
+			if.l.add(condit);
+			Data d_then=new Data("then","","",0,0,0,0);
+			Tree then=new Tree("then","",rangIf+1,d_condition,null);
+			for (Tree t : inst) {
+				if (t != null) {
+					then.l.add(t);
+				}
+			}
+			then.l.add(r);
+			
+			if.l.add(condition);
+			if.l.add(then);
+			RESULT = if;
+		:}
+	|  ifIdentifier CO BooleanExpression CF ACO Instruction:inst IfReturn:r ACF ElseStatement:else;
+		{: 
+			Data d=new Data("If","","",0,0,0,rangIf+1);
+			Tree ifElse=new Tree("If","",0,d,null);  
+			if.l.add(condit);
+			Data d_then=new Data("then","","",0,0,0,0);
+			Tree then=new Tree("then","",1,d_condition,null);
+			then.l.add(inst)
+			Data d_else=new Data("else","","",0,0,0,rangIf+1);
+			Tree else=new Tree("else","",0,d_condition,null);
+			else.l.add(else)
+			if.l.add(condition);
+			if.l.add(then);
+			if.l.add(else);
+			RESULT = ifElse;
+		:}
+	//profil : if [i<2]{...}
+
+ElseStatement ::= elseIdentifier ACO Instruction:inst IfReturn ACF;
+		{: 
+			RESULT = inst ;
+		:}
+
+IfReturn ::= returnIdentifier TextRecursive:x endLineStatement
+		{: 
+			Data d=new Data("Return","","",0,0,0,0);
+			Tree retIf=new Tree("ReturnIf","",0,d,rangIf+1);  
+			for (Tree t : x) {
+				if (t != null) {
+					retIf.l.add(t);
+				}
+			}
+			
+			RESULT = retIf;
+		:}
+	| returnIdentifier BooleanExpression endLineStatement
+	| returnIdentifier Expression endLineStatement
+	| /* nothing*/;
+
 //Boolean operation recursively builded with operators
 
-booleanExpression ::= booleanExpression booleanOperator booleanExpression
-	| expression booleanOperator expression
-	| boolean ;
+
+BooleanExpression ::= bool
+	| Expression BooleanOperator Expression
+	| notIdentifier BooleanExpression
+	| bool equalIdentifier BooleanExpression
+	| bool differentIdentifier BooleanExpression
+		;
+
 
 //Boolean operator, used in booleanExpressions
 
-booleanOperator ::= equalIdentifier
+BooleanOperator ::= equalIdentifier
 	| higherThanIdentifier
 	| higherEqualThanIdentifier
 	| lesserThanIdentifier
@@ -173,8 +299,8 @@ booleanOperator ::= equalIdentifier
 	| orIdentifier
 	| andIdentifier
 	| xorIdentifier;
+  
+// The basic while loop
 
-Type ::= booleanIdentifier
-	| numberIdentifier
-	| textIdentifier
-	;
+WhileLoopStatement ::= whileIdentifier CO BooleanExpression CF ACO Instruction ACF;
+	//profil : while [i<2]{...}
