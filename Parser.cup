@@ -21,7 +21,9 @@ action code {: Tree arbre_prgme = new Tree("PROGRAMME",null,null,null,null,null,
 				;
 
 
+
 /* la grammaire */
+
 
 terminal recognitionLanguageStatement, mainStatement, endLineStatement;
 terminal CO, CF, ACO, ACF, PO, PF, VIR;
@@ -42,6 +44,7 @@ terminal affectationIdentifier, returnIdentifier, ifIdentifier, elseIdentifier, 
 non terminal Pony;
 non terminal Content;
 non terminal MainFunction;
+
 non terminal LinkedList <Tree> Instruction,ElseStatement, TextRecursive;
 non terminal AffectationSecondPart , WhileLoopStatement;
 //non terminal Type;
@@ -52,27 +55,24 @@ non terminal Function, Param, UnTypedParam, TextFunction, BoolFunction, Function
 
 
 
+
 start with Pony;
 
 // the language itself.
 
-
-Pony ::= recognitionLanguageStatement endLineStatement Content ;
-	
+Pony ::= recognitionLanguageStatement endLineStatement Content;
 
 // A mix composed of the main function and instructions and functions.
 
-Content ::= MainFunction 
-	| AffectationStatement endLineStatement Content
-		
-	| Function: t1 Content {: t1.nomIdentificateur="fonction"; t1.ref.t.type="Num"; t.l.add(t1):}
-	| TextFunction: t1 Content {: t1.nomIdentificateur="fonction"; t1.ref.t.type="Text"; t.l.add(t1):}
-	| BoolFunction:t1 Content {: t1.nomIdentificateur="fonction"; t1.ref.t.type="Bool"; t.l.add(t1):}
+Content ::= MainFunction
+	| AffectationStatement endLineStatement Content 
+	| Function Content
+	| TextFunction Content
+	| BoolFunction Content
 	| /*(nothing)*/;
 
 
 // the main function of the program, may use other functions.
-
 
 
 MainFunction ::= mainStatement : main_fct CO CF ACO Instruction:liste_instruction ACF 
@@ -84,6 +84,7 @@ MainFunction ::= mainStatement : main_fct CO CF ACO Instruction:liste_instructio
 			t1.l.add(liste_instruction)
 		:}
 		;
+
 	//profil :  main[] { [..] }
 
 // classic function with a given return type (may be void), the return is always
@@ -101,6 +102,7 @@ Function ::= numberIdentifier idf CO Param CF ACO Instruction returnIdentifier E
 	| vide idf CO CF ACO Instruction ACF;
 
 FunctionStatement ::= idf CO UnTypedParam CF ;
+
 
 TextRecursive ::= text : t
 	{: 
@@ -179,11 +181,13 @@ AffectationStatement ::= numberIdentifier:a idf:identifiant AffectationSecondPar
 			arbre_prgme.tds.add(d); 
 			arbre_prgme.l.add(t1)
 		:}
+
 	| idf affectationIdentifier Expression
 ;
 
 AffectationSecondPart ::= affectationIdentifier Expression
 	| /*(nothing)*/;
+
 	
 AffectationStatement ::= numberIdentifier:a idf:identifiant affectationIdentifier Expression:e
 		{: 
@@ -198,6 +202,7 @@ AffectationStatement ::= numberIdentifier:a idf:identifiant affectationIdentifie
 	| idf affectationIdentifier Expression
 	| numberIdentifier:a idf:identifiant
 ;
+
 
 // Mathematical operation (non boolean) recursively builded with operators
  
@@ -219,6 +224,7 @@ Operator ::= additionOperator
 	| divisionOperator;
 
 // A simple if
+
 
 IfStatement ::= ifIdentifier CO BooleanExpression:condit CF ACO Instruction :inst IfReturn:r ACF
 		{: 
@@ -273,6 +279,7 @@ IfReturn ::= returnIdentifier TextRecursive:x endLineStatement
 			
 			RESULT = retIf;
 		:}
+
 	| returnIdentifier BooleanExpression endLineStatement
 	| returnIdentifier Expression endLineStatement
 	| /* nothing*/;
@@ -302,5 +309,7 @@ BooleanOperator ::= equalIdentifier
   
 // The basic while loop
 
+
 WhileLoopStatement ::= whileIdentifier CO BooleanExpression CF ACO Instruction ACF;
 	//profil : while [i<2]{...}
+

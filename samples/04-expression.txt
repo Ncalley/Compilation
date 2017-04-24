@@ -1,0 +1,15 @@
+/*
+ * Test d'une expression arithmetique
+ */
+#PONY# <3
+Num i <3
+Num j <3
+
+Main[]{
+	i <- 0 <3
+	j <- (2+i) - (3+i) <3
+	
+}
+
+
+ 

@@ -1,0 +1,14 @@
+/*
+ * conditionnelle
+ */
+#PONY# <3
+Num i <- 3 <3
+Num j <3
+Main []{
+	If[i < 2]{
+		j <- 0 <3
+	}
+	Else{
+		j <- 1<3
+}
+} 

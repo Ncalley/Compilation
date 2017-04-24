@@ -1,0 +1,16 @@
+/*
+ * boucle
+ */
+
+#PONY#<3
+Num i <3
+Num j <3
+
+Main[]{
+	i <- 0 <3
+	j <- 0 <3
+	While [i < 3]{
+		j <- j + i <3
+	}
+}
+
