@@ -4,21 +4,17 @@
  
 package fr.ul.miage.exemple.generated;
 
-import java.util.LinkedList;
+/*import java.util.LinkedList;
+import java.util.HashMap;*/
 
 
-action code {: Tree arbre_prgme = new Tree("PROGRAMME",null,null,null,null,null,null);
-				LinkedList <Tree> liste_Inter= new LinkedList<Tree>();
+/*action code {: Tree arbre_prgme = new Tree("PROGRAMME",null,null,null,null,null,null);
+				LinkedList<Tree> liste_Inter= new LinkedList<Tree>();
 				Integer rangIf=0; //pour incrémenter les if et tout
-				LinkedList <Tree> liste_InterText= new LinkedList<Tree>();
-				
-				ArrayList<Noeud> listeTemporaire2 = new ArrayList<Noeud>();
-				ArrayList<Noeud> boucle1 = new ArrayList<Noeud>();
-				ArrayList<Noeud> boucle2 = new ArrayList<Noeud>();
-				ArrayList<Noeud> listeFonction = new ArrayList<Noeud>();
-				ArrayList<String> listeParametre = new ArrayList<String>();
+				Integer rangf=0;
+				LinkedList<Tree> liste_InterText= new LinkedList<Tree>();
 			:}
-				;
+				;*/
 
 
 
@@ -45,13 +41,15 @@ non terminal Pony;
 non terminal Content;
 non terminal MainFunction;
 
-non terminal LinkedList <Tree> Instruction,ElseStatement, TextRecursive;
+non terminal /*LinkedList <Tree>*/ Instruction,ElseStatement, TextRecursive;
 non terminal AffectationSecondPart , WhileLoopStatement;
 //non terminal Type;
-non terminal Expression, 
-non terminal Tree BooleanExpression,AffectationStatement,IfStatement,IfReturn;
-non terminal Operator, BooleanOperator;
-non terminal Function, Param, UnTypedParam, TextFunction, BoolFunction, FunctionStatement;
+non terminal Expression, Facteur, Atome; 
+non terminal /*Tree*/ BooleanExpression;
+non terminal /*Integer*/ Param;
+non terminal AffectationStatement,IfStatement,IfReturn;
+non terminal BooleanOperator;
+non terminal Function, UnTypedParam, TextFunction, BoolFunction, FunctionStatement;
 
 
 
@@ -75,14 +73,14 @@ Content ::= MainFunction
 // the main function of the program, may use other functions.
 
 
-MainFunction ::= mainStatement : main_fct CO CF ACO Instruction:liste_instruction ACF 
-		{:
-			Data d=new Data("Main","fonction","void",0,0,0,0);
-			Tree t1=new Tree("MainFunction","Function",1,d,null);  
+MainFunction ::= mainStatement /*: main_fct*/ CO CF ACO Instruction/*:liste_instruction*/ ACF 
+		/*{:
+			Data d=new Data(main_fct,"fonction","void",null,null,null,1);
+			Tree t1=new Tree(main_fct,1,null,"fonction",d,null,null);  
 			arbre_prgme.tds.add(d); 
-			arbre_prgme.l.add(t1)
-			t1.l.add(liste_instruction)
-		:}
+			arbre_prgme.l.add(t1);
+			t1.l.add(liste_instruction);
+		:}*/
 		;
 
 	//profil :  main[] { [..] }
@@ -91,38 +89,54 @@ MainFunction ::= mainStatement : main_fct CO CF ACO Instruction:liste_instructio
 // at the end of the function for the moment (can't be used inside of a loop).
  
 
-TextFunction ::= textIdentifier idf CO Param CF ACO Instruction returnIdentifier TextRecursive endLineStatement ACF
+TextFunction ::= textIdentifier idf/*:id*/ CO Param/*:p*/ CF ACO Instruction returnIdentifier TextRecursive/*:res*/ endLineStatement ACF 
+		/*{:
+			rangf++;
+			Data d=new Data(id,"Text",p,0,null,rangf);
+			Tree t1=new Tree(id,rangf,null,"fonction",d,null,null);  
+			arbre_prgme.tds.add(d); 
+			arbre_prgme.l.add(t1);
+			t1.l.add(liste_instruction);
+		:}*/
 	;
 
-BoolFunction ::= booleanIdentifier idf CO Param CF ACO Instruction returnIdentifier BooleanExpression endLineStatement ACF
-	| booleanIdentifier idf CO Param CF ACO Instruction returnIdentifier idf endLineStatement ACF
+BoolFunction ::= booleanIdentifier idf/*:id*/ CO Param CF ACO Instruction returnIdentifier BooleanExpression/*:res*/ endLineStatement ACF 
+	| booleanIdentifier idf/*:id*/ CO Param CF ACO Instruction returnIdentifier idf/*:res*/ endLineStatement ACF 
 	;
 
-Function ::= numberIdentifier idf CO Param CF ACO Instruction returnIdentifier Expression endLineStatement ACF
-	| vide idf CO CF ACO Instruction ACF;
+Function ::= numberIdentifier idf/*:id*/ CO Param CF ACO Instruction returnIdentifier Expression/*:res*/ endLineStatement ACF 
+	| vide idf/*:id*/ CO CF ACO Instruction ACF ;
 
-FunctionStatement ::= idf CO UnTypedParam CF ;
+FunctionStatement ::= idf/*:id*/ CO UnTypedParam CF;
 
 
-TextRecursive ::= text : t
-	{: 
-			liste_InterText.removeAll()
-			Data d=new Data("Text","text","void",null,null,null,null);
-			Tree t=new Tree("Text","text",null,d,null); 
+TextRecursive ::= text /*: t*/
+	/*{: 
+			liste_InterText.removeAll();
+			Data d=new Data("t","globale/locale","Text",null,null,t,null);
+			Tree t=new Tree("Text",t,null,new Reference("Text",d),null,null); 
 			liste_InterText.add(t);
-			
+			arbreProgramme.tds.add(d);
 			RESULT = liste_InterText;
-		:}
-	| text additionOperator FunctionStatement;
+		:}*/
+	| text/*:t*/ additionOperator FunctionStatement/*:f*/
+/*{: 
+			liste_InterText.removeAll();
+			Data d=new Data("t","globale/locale","Text",null,null,t+f,null);
+			Tree t=new Tree("Text",t,null,new Reference("Text",d),null,null); 
+			liste_InterText.add(t);
+			arbreProgramme.tds.add(d);
+			RESULT = liste_InterText;
+		:}*/;
 
 
-Param ::= numberIdentifier Expression VIR Param
-	| booleanIdentifier bool VIR Param
-	| textIdentifier text VIR Param
-	| numberIdentifier Expression
-	| booleanIdentifier bool
-	| textIdentifier text
-	|/*nothing*/
+Param ::= numberIdentifier Expression VIR Param/*:p {:RESULT=new Integer(p+1):}*/
+	| booleanIdentifier bool VIR Param/*:p {:RESULT=new Integer(p+1):}*/
+	| textIdentifier text VIR Param/*:p {:RESULT=new Integer(p+1):}*/
+	| numberIdentifier Expression /*{:RESULT=1:}*/
+	| booleanIdentifier bool /*{:RESULT=1:}*/
+	| textIdentifier text /*{:RESULT=1:}*/
+	|/*nothing*/ /*{:RESULT=0:}*/
 	;
 	
 UnTypedParam ::= Expression VIR UnTypedParam
@@ -135,8 +149,8 @@ UnTypedParam ::= Expression VIR UnTypedParam
 
 // Any loop, variable manipulation or printStatement
 
-Instruction ::= AffectationStatement : a endLineStatement Instruction : inst
-		{: 
+Instruction ::= AffectationStatement /*: a*/ endLineStatement Instruction /*: inst*/
+	/*{: 
 			liste_Inter.removeAll()
 			liste_Inter.add(a)
 			for (Tree t : inst) {
@@ -145,9 +159,9 @@ Instruction ::= AffectationStatement : a endLineStatement Instruction : inst
 				}
 			}
 			RESULT = liste_Inter;
-		:}
-	| IfStatement :if Instruction:inst
-		{: 
+		:}*/
+	| IfStatement /*:if*/ Instruction/*:inst*/
+	/*{: 
 			liste_Inter.removeAll()
 			liste_Inter.add(if)
 			for (Tree t : inst) {
@@ -156,9 +170,9 @@ Instruction ::= AffectationStatement : a endLineStatement Instruction : inst
 				}
 			}
 			RESULT = liste_Inter;
-		:}
-	| WhileLoopStatement:w Instruction:inst
-	 	{: 
+		:}*/
+	| WhileLoopStatement/*:w*/ Instruction/*:inst*/
+	 	/*{: 
 			liste_Inter.removeAll()
 			liste_Inter.add(w)
 			for (Tree t : inst) {
@@ -167,67 +181,53 @@ Instruction ::= AffectationStatement : a endLineStatement Instruction : inst
 				}
 			}
 			RESULT = liste_Inter;
-		:}
+		:*/
 	| /* nothing */ 
-	;//RESULT de la liste temporaire
+	;
 
 // The binding of a value to a variable 
 
-AffectationStatement ::= numberIdentifier:a idf:identifiant AffectationSecondPart
-		{: 
-			Data d=new Data(identifiant,"globale/locale","Num",0,0,0,0);
-			t1=new Tree("AffectationStatement","",null,d,null);  
-			first_part=new Tree(identifiant,"",null,null,null);  
+AffectationStatement ::= numberIdentifier/*:a*/ idf/*:identifiant*/ AffectationSecondPart/*:af*/
+		/*{: 
+			Data d=new Data(identifiant,"globale/locale","Num",null,null,af,null);
+			Tree t1=new Tree("AffectationStatement",af,null,new Reference("Affectation",d),null,null);  
+			first_part=new Tree(identifiant,af,null,null,null,null);  
 			arbre_prgme.tds.add(d); 
-			arbre_prgme.l.add(t1)
-		:}
+			arbre_prgme.l.add(t1);
+		:}*/
 
 	| idf affectationIdentifier Expression
 ;
 
-AffectationSecondPart ::= affectationIdentifier Expression
-	| /*(nothing)*/;
+AffectationSecondPart ::= affectationIdentifier Expression/*:e {:RESULT=e:}*/
+	| /*(nothing)*/ /*{:RESULT=null:}*/;
 
 	
-AffectationStatement ::= numberIdentifier:a idf:identifiant affectationIdentifier Expression:e
-		{: 
-			Data d=new Data(identifiant,"globale/locale","Num",0,0,RECUPERER INFO DE EXPRESSION,0);
-			t1=new Tree("AffectationStatement","",null,d,null);  
-			first_part=new Tree(identifiant,"",null,null,null);  
-			sec_part=new Tree(RECUPERER INFO DE EXPRESSION,"",null,null,null);  
-			t1.l.add(first_part);
-			t1.l.add(sec_part);
-			RESULT = t1;
-		:}
-	| idf affectationIdentifier Expression
-	| numberIdentifier:a idf:identifiant
-;
 
 
 // Mathematical operation (non boolean) recursively builded with operators
- 
-Expression ::= PO Expression PF 
-	| PO Expression PF  Operator Expression
-	| number Operator Expression
-	| idf Operator Expression
-	| FunctionStatement Operator Expression 
-	| number
-	| idf
-	| FunctionStatement
+
+	
+Expression ::= Expression additionOperator Facteur
+	| Expression substractionOperator Facteur
+	| Facteur
 	;
 
-//Mathematical operators, used in expressions
+Facteur ::= Facteur multiplicationOperator Atome
+	| Facteur divisionOperator Atome
+	| Atome;
+	
+Atome ::= number 
+	| PO Expression PF
+	| FunctionStatement
+	| idf;
 
-Operator ::= additionOperator
-	| substractionOperator
-	| multiplicationOperator
-	| divisionOperator;
 
 // A simple if
 
 
-IfStatement ::= ifIdentifier CO BooleanExpression:condit CF ACO Instruction :inst IfReturn:r ACF
-		{: 
+IfStatement ::= ifIdentifier CO BooleanExpression/*:condit*/ CF ACO Instruction /*:inst*/ IfReturn/*:r*/ ACF
+		/*{: 
 			Data d=new Data("If","","",0,0,0,0);
 			Tree if=new Tree("If","",rangIf+1,d,null);  
 			if.l.add(condit);
@@ -243,32 +243,32 @@ IfStatement ::= ifIdentifier CO BooleanExpression:condit CF ACO Instruction :ins
 			if.l.add(condition);
 			if.l.add(then);
 			RESULT = if;
-		:}
-	|  ifIdentifier CO BooleanExpression CF ACO Instruction:inst IfReturn:r ACF ElseStatement:else;
-		{: 
+		:}*/
+	|  ifIdentifier CO BooleanExpression CF ACO Instruction/*:inst*/ IfReturn/*:r*/ ACF ElseStatement/*:else*/
+		/*{: 
 			Data d=new Data("If","","",0,0,0,rangIf+1);
 			Tree ifElse=new Tree("If","",0,d,null);  
 			if.l.add(condit);
 			Data d_then=new Data("then","","",0,0,0,0);
 			Tree then=new Tree("then","",1,d_condition,null);
-			then.l.add(inst)
+			then.l.add(inst);
 			Data d_else=new Data("else","","",0,0,0,rangIf+1);
 			Tree else=new Tree("else","",0,d_condition,null);
-			else.l.add(else)
+			else.l.add(else);
 			if.l.add(condition);
 			if.l.add(then);
 			if.l.add(else);
 			RESULT = ifElse;
-		:}
+		:}*/;
 	//profil : if [i<2]{...}
 
-ElseStatement ::= elseIdentifier ACO Instruction:inst IfReturn ACF;
-		{: 
+ElseStatement ::= elseIdentifier ACO Instruction/*:inst*/ IfReturn ACF
+		/*{: 
 			RESULT = inst ;
-		:}
+		:}*/;
 
-IfReturn ::= returnIdentifier TextRecursive:x endLineStatement
-		{: 
+IfReturn ::= returnIdentifier TextRecursive/*:x*/ endLineStatement
+		/*{: 
 			Data d=new Data("Return","","",0,0,0,0);
 			Tree retIf=new Tree("ReturnIf","",0,d,rangIf+1);  
 			for (Tree t : x) {
@@ -278,7 +278,7 @@ IfReturn ::= returnIdentifier TextRecursive:x endLineStatement
 			}
 			
 			RESULT = retIf;
-		:}
+		:}*/
 
 	| returnIdentifier BooleanExpression endLineStatement
 	| returnIdentifier Expression endLineStatement
