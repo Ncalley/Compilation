@@ -19,8 +19,8 @@ public class assembleur {
 /* EXEMPLE :
  * data :
  * i : LONG(0) //int i =0
- * j : LONG(0) // pas d’ initialisation donc on met 0
- * k : LONG(0)// pas d’ initialisation donc on met 0
+ * j : LONG(0) // pas dâ€™ initialisation donc on met 0
+ * k : LONG(0)// pas dâ€™ initialisation donc on met 0
 */	
 	public String generer_data (Data[] tds){
 		String res;
@@ -36,16 +36,16 @@ public class assembleur {
 /* de type " fonction | " */
 	public String generer_fonction (Tree a){
 		String res;
-		res = a.ref.nom + ":";
+		res = a.ref + ":";
 		res += "PUSH (LP) \n"
 				+ "PUSH (BP) \n"
 				+ " MOVE(SP, BP) \n";
-		int n = a.ref.t.nbVarLocale;
+		int n = a.t.nbVarLocale;
 		res += "ALLOCATE("+n+") \n";
 		for (Tree f : a.l){
 			res += generer_instruction(f);
 		}
-		res += "return_"+a.ref.nom+":"
+		res += "return_"+a.ref+":"
 				+ " DEALLOCATE("+n+") \n"
 				+ " POP (BP) \n"
 				+ " POP (LP) \n"
@@ -54,7 +54,7 @@ public class assembleur {
 	}
 	public String generer_instruction (Tree a){
 		String res = "";
-		switch (a.ref.nom){
+		switch (a.ref){
 			case "<-" : 
 				res = generer_affectation(a);
 			case "write" :
@@ -79,7 +79,7 @@ public class assembleur {
 	
 	public String generer_expression (Tree a){
 		String res = "";
-		switch (a.cat){
+		switch (a.t.cat){
 		case "cst" : 
 			res = "CMOVE("+a.val+",R0) \n"
 					+ "PUSH(R0) \n";
@@ -122,11 +122,11 @@ public class assembleur {
 		String res = "";
 		if (a.l.size()==1){
 			res = generer_expression(a.l.get(0));
-			int b = (-a.ref.t.nbParam -2) * 4;
+			int b = (-a.t.nbParam -2) * 4;
 			res+= "POP(R0) \n"
 					+ "PUTFRAME(R0,"+b+")";
 		}
-		res+= "BR(return_"+a.ref.t.nom+")";
+		res+= "BR(return_"+a.t.nom+")";
 		return res;
 	}
 	
@@ -143,7 +143,7 @@ public class assembleur {
 	}
 	public String generer_condition(Tree a){
 		String res="";
-		switch (a.ref.nom){
+		switch (a.ref){
 		case ">" :
 			res+= generer_expression (a.l.get(0));
 			res+= generer_expression (a.l.get(1));
@@ -207,7 +207,7 @@ public class assembleur {
 	}
 	public String generer_ecrire(Tree a){
 		String res="";
-		
+		res+= "";
 		return res;
 	}
 }
